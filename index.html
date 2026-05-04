@@ -2,1233 +2,1133 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Okids – تطبيق الطلبات</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0D3B8C">
+<title>Okids – طلبات التجار</title>
 <style>
-  /* ===== RESET & GLOBAL ===== */
-  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  :root {
-    --blue-dark:  #0D3B8C;
-    --blue-mid:   #1A5DC8;
-    --blue-light: #E8F0FE;
-    --red:        #E02020;
-    --white:      #FFFFFF;
-    --gray-bg:    #F4F6FB;
-    --gray-text:  #5A6272;
-    --card-shadow: 0 4px 18px rgba(13,59,140,0.10);
-    --radius:     18px;
-    --radius-sm:  10px;
-  }
+/* ========== RESET ========== */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body { width:100%; height:100%; overflow:hidden; }
 
-  body {
-    font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
-    background: #E0E6F5;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: 100vh;
-    padding: 30px 10px;
-    gap: 24px;
-    flex-wrap: wrap;
-  }
+body {
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+  background: #F4F6FB;
+  color: #1a1a2e;
+  overscroll-behavior: none;
+}
 
-  /* ===== PHONE FRAME ===== */
-  .phone {
-    width: 360px;
-    min-height: 780px;
-    background: var(--gray-bg);
-    border-radius: 40px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.22), inset 0 0 0 3px #C8D4EE;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    border: 6px solid #1a1a2e;
-  }
+/* ========== CSS VARIABLES ========== */
+:root {
+  --blue:       #0D3B8C;
+  --blue2:      #1A5DC8;
+  --blue-light: #E8F0FE;
+  --red:        #E02020;
+  --green:      #28C76F;
+  --gray:       #F4F6FB;
+  --gray2:      #8A94A6;
+  --white:      #FFFFFF;
+  --shadow:     0 4px 20px rgba(13,59,140,0.12);
+  --radius:     16px;
+  --r-sm:       10px;
+}
 
-  /* Status bar */
-  .status-bar {
-    background: var(--blue-dark);
-    color: white;
-    font-size: 11px;
-    padding: 6px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-weight: 600;
-  }
+/* ========== APP SHELL ========== */
+#app {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
 
-  /* Screen label */
-  .screen-label {
-    position: absolute;
-    top: -28px;
-    right: 0;
-    background: var(--blue-dark);
-    color: white;
-    font-size: 12px;
-    font-weight: 700;
-    padding: 4px 14px;
-    border-radius: 8px 8px 0 0;
-    letter-spacing: 0.5px;
-  }
+/* ========== SCREENS ========== */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--gray);
+  transform: translateX(100%);
+  transition: transform 0.32s cubic-bezier(.4,0,.2,1);
+  will-change: transform;
+  z-index: 1;
+}
+.screen.active  { transform: translateX(0);    z-index: 10; }
+.screen.leaving { transform: translateX(-30%); z-index: 5; }
 
-  .phone-wrapper {
-    position: relative;
-    display: inline-block;
-  }
+/* ========== STATUS BAR ========== */
+.status-bar {
+  background: var(--blue);
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 8px 18px 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  letter-spacing: 0.3px;
+}
 
-  /* ===== SCREEN CONTENT ===== */
-  .screen {
-    flex: 1;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    background: var(--gray-bg);
-  }
-  .screen::-webkit-scrollbar { display: none; }
+/* ========== TOP BAR ========== */
+.top-bar {
+  background: var(--blue);
+  padding: 12px 18px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  gap: 10px;
+}
+.logo-wrap { display:flex; flex-direction:column; line-height:1; }
+.logo-main {
+  font-size: 24px; font-weight: 900; color: white; letter-spacing: 1px;
+}
+.logo-main span { color: #FF6B6B; }
+.logo-sub { font-size: 10px; color: #A8C4F0; font-weight: 500; margin-top:2px; }
+.top-actions { display:flex; gap:8px; }
+.icon-btn {
+  width: 38px; height: 38px;
+  background: rgba(255,255,255,0.15);
+  border: none; border-radius: 50%;
+  color: white; font-size: 17px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; position: relative;
+  transition: background 0.15s;
+}
+.icon-btn:active { background: rgba(255,255,255,0.28); }
+.badge {
+  position: absolute; top: -3px; right: -3px;
+  background: var(--red); color: white;
+  font-size: 9px; font-weight: 800;
+  width: 17px; height: 17px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
 
-  /* ===== TOP NAV ===== */
-  .top-nav {
-    background: var(--blue-dark);
-    padding: 14px 18px 18px;
-    color: white;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    justify-content: space-between;
-  }
-  .logo-area { display: flex; flex-direction: column; }
-  .logo-brand {
-    font-size: 26px;
-    font-weight: 900;
-    color: var(--white);
-    letter-spacing: 1px;
-    line-height: 1;
-  }
-  .logo-brand span { color: #FF6B6B; }
-  .logo-sub {
-    font-size: 10px;
-    color: #A8C4F0;
-    letter-spacing: 0.5px;
-    font-weight: 500;
-  }
-  .nav-icons { display: flex; gap: 10px; }
-  .nav-icon {
-    width: 36px; height: 36px;
-    background: rgba(255,255,255,0.15);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px;
-    cursor: pointer;
-    border: none;
-    color: white;
-    position: relative;
-  }
-  .badge {
-    position: absolute;
-    top: -3px; right: -3px;
-    background: var(--red);
-    color: white;
-    font-size: 9px;
-    font-weight: 700;
-    width: 16px; height: 16px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-  }
+/* ========== PAGE HEADER (inner screens) ========== */
+.page-header {
+  background: var(--blue);
+  padding: 12px 16px 13px;
+  display: flex; align-items: center; gap: 10px;
+  flex-shrink: 0; color: white;
+}
+.back-btn {
+  background: rgba(255,255,255,0.15);
+  border: none; color: white;
+  width: 36px; height: 36px; border-radius: 10px;
+  font-size: 20px; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.back-btn:active { background: rgba(255,255,255,0.28); }
+.page-title { font-size: 17px; font-weight: 800; flex:1; }
 
-  /* ===== SEARCH BAR ===== */
-  .search-bar {
-    background: var(--blue-dark);
-    padding: 0 18px 16px;
-  }
-  .search-input {
-    width: 100%;
-    background: rgba(255,255,255,0.15);
-    border: none;
-    border-radius: 25px;
-    padding: 10px 16px 10px 40px;
-    color: white;
-    font-size: 13px;
-    outline: none;
-  }
-  .search-input::placeholder { color: rgba(255,255,255,0.6); }
-  .search-wrap { position: relative; }
-  .search-icon {
-    position: absolute;
-    left: 14px; top: 50%;
-    transform: translateY(-50%);
-    font-size: 14px;
-    color: rgba(255,255,255,0.7);
-    pointer-events: none;
-  }
+/* ========== SEARCH BAR ========== */
+.search-wrap {
+  background: var(--blue);
+  padding: 0 16px 14px;
+  flex-shrink: 0;
+}
+.search-inner {
+  position: relative;
+  background: rgba(255,255,255,0.15);
+  border-radius: 25px;
+  display: flex; align-items: center;
+  padding: 0 14px;
+}
+.search-inner input {
+  flex:1; background:transparent; border:none; outline:none;
+  color: white; font-size: 13px; padding: 11px 0 11px 8px;
+  direction: rtl;
+}
+.search-inner input::placeholder { color: rgba(255,255,255,0.55); }
+.search-inner .si { color: rgba(255,255,255,0.65); font-size: 15px; }
 
-  /* ===== WELCOME BANNER ===== */
-  .welcome-banner {
-    margin: 14px 16px;
-    background: linear-gradient(135deg, var(--blue-mid) 0%, var(--blue-dark) 100%);
-    border-radius: var(--radius);
-    padding: 18px 20px;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: var(--card-shadow);
-    position: relative;
-    overflow: hidden;
-  }
-  .welcome-banner::before {
-    content: '';
-    position: absolute;
-    top: -20px; left: -20px;
-    width: 100px; height: 100px;
-    background: rgba(255,255,255,0.07);
-    border-radius: 50%;
-  }
-  .welcome-banner::after {
-    content: '';
-    position: absolute;
-    bottom: -30px; right: 60px;
-    width: 80px; height: 80px;
-    background: rgba(255,255,255,0.05);
-    border-radius: 50%;
-  }
-  .welcome-text h2 { font-size: 15px; font-weight: 700; }
-  .welcome-text p { font-size: 11px; color: #A8C4F0; margin-top: 4px; }
-  .welcome-emoji { font-size: 40px; }
+/* ========== SCROLLABLE CONTENT ========== */
+.scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+.scroll-area::-webkit-scrollbar { display:none; }
 
-  /* ===== ORDER NOW BTN ===== */
-  .order-now-btn {
-    display: block;
-    margin: 0 16px 14px;
-    background: linear-gradient(135deg, var(--red), #C01010);
-    color: white;
-    border: none;
-    border-radius: 30px;
-    padding: 14px;
-    font-size: 16px;
-    font-weight: 800;
-    letter-spacing: 0.5px;
-    cursor: pointer;
-    text-align: center;
-    box-shadow: 0 6px 20px rgba(224,32,32,0.35);
-    width: calc(100% - 32px);
-    transition: transform 0.15s;
-  }
-  .order-now-btn:active { transform: scale(0.97); }
+/* ========== BOTTOM NAV ========== */
+.bottom-nav {
+  background: white;
+  display: flex; justify-content: space-around;
+  padding: 8px 0 max(10px, env(safe-area-inset-bottom));
+  box-shadow: 0 -3px 16px rgba(0,0,0,0.08);
+  flex-shrink: 0;
+  z-index: 100;
+}
+.bn {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 3px;
+  cursor: pointer; min-width: 56px;
+  transition: transform 0.15s;
+}
+.bn:active { transform: scale(0.9); }
+.bn-icon { font-size: 21px; }
+.bn-label { font-size: 10px; font-weight: 600; color: var(--gray2); }
+.bn.active .bn-label { color: var(--blue); }
+.bn-bar { width: 20px; height: 3px; background: var(--blue); border-radius: 2px; }
 
-  /* ===== SECTION TITLE ===== */
-  .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 6px 18px 10px;
-  }
-  .section-title {
-    font-size: 15px;
-    font-weight: 800;
-    color: var(--blue-dark);
-  }
-  .section-link {
-    font-size: 12px;
-    color: var(--blue-mid);
-    font-weight: 600;
-    cursor: pointer;
-  }
+/* ========== SECTION HEADER ========== */
+.sec-head {
+  display: flex; justify-content: space-between;
+  align-items: center; padding: 14px 16px 8px;
+}
+.sec-title { font-size: 15px; font-weight: 800; color: var(--blue); }
+.sec-link  { font-size: 12px; color: var(--blue2); font-weight: 600; cursor:pointer; }
 
-  /* ===== CATEGORIES ===== */
-  .categories {
-    display: flex;
-    gap: 10px;
-    padding: 0 16px 14px;
-    overflow-x: auto;
-  }
-  .categories::-webkit-scrollbar { display: none; }
-  .cat-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-    min-width: 70px;
-    cursor: pointer;
-  }
-  .cat-icon {
-    width: 54px; height: 54px;
-    border-radius: 16px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 24px;
-    box-shadow: 0 3px 10px rgba(13,59,140,0.12);
-  }
-  .cat-icon.active { background: var(--blue-dark); }
-  .cat-icon.c1 { background: #E8F3FF; }
-  .cat-icon.c2 { background: #FFF3E8; }
-  .cat-icon.c3 { background: #F0FFE8; }
-  .cat-icon.c4 { background: #FFE8F0; }
-  .cat-icon.c5 { background: #F8E8FF; }
-  .cat-label { font-size: 11px; color: var(--gray-text); font-weight: 600; text-align: center; }
+/* ========== WELCOME CARD ========== */
+.welcome-card {
+  margin: 14px 16px 10px;
+  background: linear-gradient(135deg, var(--blue2), var(--blue));
+  border-radius: var(--radius);
+  padding: 18px 18px 18px 16px;
+  color: white;
+  display: flex; align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow);
+  overflow: hidden; position: relative;
+}
+.welcome-card::before {
+  content:''; position:absolute;
+  top:-20px; left:-20px;
+  width:90px; height:90px;
+  background: rgba(255,255,255,0.06);
+  border-radius:50%;
+}
+.wc-text h2 { font-size: 15px; font-weight: 800; }
+.wc-text p  { font-size: 11px; color:#A8C4F0; margin-top:4px; }
+.wc-icon { font-size: 46px; }
 
-  /* ===== FEATURED PRODUCTS (horizontal scroll) ===== */
-  .featured-scroll {
-    display: flex;
-    gap: 12px;
-    padding: 0 16px 16px;
-    overflow-x: auto;
-  }
-  .featured-scroll::-webkit-scrollbar { display: none; }
+/* ========== PROMO BANNER ========== */
+.promo {
+  margin: 0 16px 12px;
+  background: linear-gradient(120deg, #FF6B6B, var(--red));
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  display: flex; align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 14px rgba(224,32,32,0.22);
+}
+.promo-left em { display:block; font-style:normal; font-size:15px; font-weight:800; color:white; }
+.promo-left span { font-size:11px; color:rgba(255,255,255,0.85); }
+.promo-code {
+  background: rgba(255,255,255,0.2);
+  border: 1.5px dashed rgba(255,255,255,0.65);
+  padding: 5px 12px; border-radius:8px;
+  font-size: 12px; font-weight:800; color:white;
+}
 
-  .feat-card {
-    min-width: 150px;
-    background: white;
-    border-radius: var(--radius);
-    padding: 14px 12px 12px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    box-shadow: var(--card-shadow);
-    cursor: pointer;
-    flex-shrink: 0;
-    position: relative;
-    border: 1.5px solid transparent;
-    transition: border-color 0.2s;
-  }
-  .feat-card:hover { border-color: var(--blue-mid); }
-  .feat-badge {
-    position: absolute;
-    top: 10px; right: 10px;
-    background: var(--red);
-    color: white;
-    font-size: 9px;
-    font-weight: 700;
-    padding: 2px 7px;
-    border-radius: 20px;
-  }
-  .feat-img {
-    width: 80px; height: 80px;
-    object-fit: contain;
-    font-size: 50px;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .feat-name {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--blue-dark);
-    text-align: center;
-    line-height: 1.3;
-  }
-  .feat-price {
-    font-size: 14px;
-    font-weight: 800;
-    color: var(--blue-mid);
-  }
-  .feat-unit { font-size: 10px; color: var(--gray-text); margin-top: -6px; }
-  .add-btn {
-    background: var(--blue-dark);
-    color: white;
-    border: none;
-    border-radius: 20px;
-    padding: 6px 16px;
-    font-size: 18px;
-    font-weight: 900;
-    cursor: pointer;
-    width: 100%;
-    transition: background 0.15s;
-  }
-  .add-btn:hover { background: var(--blue-mid); }
+/* ========== BIG BUTTON ========== */
+.big-btn {
+  display: block;
+  margin: 0 16px 14px;
+  background: linear-gradient(135deg, var(--red), #C01010);
+  color: white; border: none; border-radius: 30px;
+  padding: 15px; font-size: 16px; font-weight: 800;
+  width: calc(100% - 32px); cursor: pointer;
+  box-shadow: 0 6px 20px rgba(224,32,32,0.32);
+  transition: transform 0.15s, box-shadow 0.15s;
+  letter-spacing: 0.3px;
+}
+.big-btn:active { transform: scale(0.97); box-shadow: none; }
 
-  /* ===== BOTTOM NAV ===== */
-  .bottom-nav {
-    background: white;
-    display: flex;
-    justify-content: space-around;
-    padding: 10px 0 14px;
-    box-shadow: 0 -4px 16px rgba(0,0,0,0.07);
-  }
-  .bn-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3px;
-    cursor: pointer;
-    font-size: 10px;
-    color: var(--gray-text);
-    font-weight: 600;
-  }
-  .bn-item.active { color: var(--blue-dark); }
-  .bn-icon { font-size: 20px; }
-  .bn-dot {
-    width: 5px; height: 5px;
-    background: var(--blue-dark);
-    border-radius: 50%;
-  }
+/* ========== CATEGORIES ========== */
+.cats {
+  display: flex; gap: 10px;
+  padding: 0 16px 14px;
+  overflow-x: auto;
+}
+.cats::-webkit-scrollbar { display:none; }
+.cat {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 5px; cursor: pointer; flex-shrink:0;
+}
+.cat-icon {
+  width: 56px; height: 56px;
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px;
+  transition: transform 0.15s;
+}
+.cat-icon:active { transform: scale(0.9); }
+.cat span { font-size: 11px; font-weight: 600; color: var(--gray2); }
+.cat.active .cat-icon { background: var(--blue) !important; }
+.cat.active span { color: var(--blue); font-weight: 800; }
+.c0 { background: var(--blue); }
+.c1 { background: #E8F3FF; }
+.c2 { background: #FFF3E8; }
+.c3 { background: #F0FFE8; }
+.c4 { background: #FFE8F0; }
+.c5 { background: #F8E8FF; }
 
-  /* ===========================
-     SCREEN 2 – PRODUCTS
-  =========================== */
-  .page-header {
-    background: var(--blue-dark);
-    padding: 14px 18px 14px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    color: white;
-  }
-  .back-btn {
-    background: rgba(255,255,255,0.15);
-    border: none;
-    color: white;
-    width: 34px; height: 34px;
-    border-radius: 10px;
-    font-size: 16px;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .page-title { font-size: 17px; font-weight: 800; }
+/* ========== FEATURED SCROLL ========== */
+.feat-scroll {
+  display: flex; gap: 12px;
+  padding: 0 16px 16px;
+  overflow-x: auto;
+}
+.feat-scroll::-webkit-scrollbar { display:none; }
 
-  .filter-bar {
-    display: flex;
-    gap: 8px;
-    padding: 12px 16px;
-    overflow-x: auto;
-  }
-  .filter-bar::-webkit-scrollbar { display: none; }
-  .filter-chip {
-    background: white;
-    border: 1.5px solid #D0DCF0;
-    color: var(--blue-dark);
-    font-size: 12px;
-    font-weight: 600;
-    padding: 6px 14px;
-    border-radius: 20px;
-    cursor: pointer;
-    white-space: nowrap;
-    flex-shrink: 0;
-    transition: all 0.15s;
-  }
-  .filter-chip.active {
-    background: var(--blue-dark);
-    color: white;
-    border-color: var(--blue-dark);
-  }
+.feat-card {
+  min-width: 148px; background: white;
+  border-radius: var(--radius);
+  padding: 14px 12px 12px;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 7px;
+  box-shadow: var(--shadow);
+  position: relative; flex-shrink: 0;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  transition: border-color 0.2s;
+}
+.feat-card:active { border-color: var(--blue2); }
+.f-badge {
+  position: absolute; top: 9px; right: 9px;
+  font-size: 9px; font-weight: 800;
+  padding: 2px 7px; border-radius: 20px; color: white;
+}
+.f-img { font-size: 52px; width:72px; height:72px; display:flex; align-items:center; justify-content:center; }
+.f-name { font-size: 12px; font-weight: 700; color: var(--blue); text-align:center; line-height:1.3; }
+.f-price { font-size: 14px; font-weight: 900; color: var(--blue2); }
+.f-unit { font-size: 10px; color: var(--gray2); margin-top:-5px; }
+.f-add {
+  background: var(--blue); color: white; border: none;
+  border-radius: 20px; padding: 7px; font-size: 20px;
+  font-weight: 900; cursor: pointer; width: 100%;
+  transition: background 0.15s;
+}
+.f-add:active { background: var(--blue2); }
 
-  .products-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    padding: 4px 14px 16px;
-  }
+/* ========== FILTER CHIPS ========== */
+.chips {
+  display: flex; gap: 8px;
+  padding: 12px 16px 4px;
+  overflow-x: auto;
+  flex-shrink: 0;
+}
+.chips::-webkit-scrollbar { display:none; }
+.chip {
+  background: white; border: 1.5px solid #D0DCF0;
+  color: var(--blue); font-size: 12px; font-weight: 600;
+  padding: 7px 14px; border-radius: 20px;
+  cursor: pointer; white-space: nowrap; flex-shrink:0;
+  transition: all 0.15s;
+}
+.chip.active { background: var(--blue); color: white; border-color: var(--blue); }
 
-  .prod-card {
-    background: white;
-    border-radius: var(--radius);
-    padding: 14px 12px 12px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 7px;
-    box-shadow: var(--card-shadow);
-    position: relative;
-    border: 1.5px solid #EEF2FB;
-  }
-  .prod-badge {
-    position: absolute;
-    top: 10px; left: 10px;
-    background: #0D3B8C10;
-    color: var(--blue-dark);
-    font-size: 9px;
-    font-weight: 700;
-    padding: 2px 7px;
-    border-radius: 10px;
-    border: 1px solid #C8D8F5;
-  }
-  .prod-img {
-    width: 75px; height: 75px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 48px;
-    margin-top: 6px;
-  }
-  .prod-name {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--blue-dark);
-    text-align: center;
-    line-height: 1.3;
-  }
-  .prod-weight { font-size: 10px; color: var(--gray-text); }
-  .prod-price-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    margin-top: 2px;
-  }
-  .prod-price {
-    font-size: 14px;
-    font-weight: 900;
-    color: var(--blue-mid);
-  }
-  .qty-ctrl {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .qty-btn {
-    width: 26px; height: 26px;
-    border-radius: 8px;
-    border: none;
-    background: var(--blue-dark);
-    color: white;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    line-height: 1;
-  }
-  .qty-btn.minus { background: #EEF2FB; color: var(--blue-dark); }
-  .qty-num {
-    font-size: 14px;
-    font-weight: 800;
-    color: var(--blue-dark);
-    min-width: 18px;
-    text-align: center;
-  }
+/* ========== PRODUCTS GRID ========== */
+.prod-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 11px;
+  padding: 10px 14px 14px;
+}
 
-  /* ===========================
-     SCREEN 3 – CART
-  =========================== */
-  .cart-list { padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+.prod-card {
+  background: white; border-radius: var(--radius);
+  padding: 13px 11px 11px;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 6px;
+  box-shadow: var(--shadow);
+  position: relative;
+  border: 1.5px solid #EEF2FB;
+}
+.p-badge {
+  position: absolute; top: 9px; left: 9px;
+  font-size: 9px; font-weight: 700;
+  padding: 2px 7px; border-radius: 10px;
+}
+.p-img { font-size: 46px; width:68px; height:68px; display:flex; align-items:center; justify-content:center; margin-top:4px; }
+.p-name { font-size: 12px; font-weight: 700; color: var(--blue); text-align:center; line-height:1.3; }
+.p-weight { font-size: 10px; color: var(--gray2); }
+.p-row { display:flex; justify-content:space-between; align-items:center; width:100%; margin-top:2px; }
+.p-price { font-size: 13px; font-weight: 900; color: var(--blue2); }
+.qty-row { display:flex; align-items:center; gap:5px; }
+.qb {
+  width: 25px; height: 25px; border-radius: 7px; border: none;
+  font-size: 16px; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.1s;
+}
+.qb:active { transform: scale(0.85); }
+.qb.plus { background: var(--blue); color: white; }
+.qb.minus { background: var(--blue-light); color: var(--blue); }
+.qn { font-size: 13px; font-weight: 800; color: var(--blue); min-width:16px; text-align:center; }
 
-  .cart-item {
-    background: white;
-    border-radius: var(--radius-sm);
-    padding: 12px 14px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    box-shadow: 0 3px 12px rgba(13,59,140,0.07);
-  }
-  .cart-img {
-    width: 56px; height: 56px;
-    background: var(--blue-light);
-    border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 32px;
-    flex-shrink: 0;
-  }
-  .cart-info { flex: 1; }
-  .cart-name { font-size: 13px; font-weight: 700; color: var(--blue-dark); }
-  .cart-weight { font-size: 11px; color: var(--gray-text); margin-top: 2px; }
-  .cart-price { font-size: 14px; font-weight: 800; color: var(--blue-mid); margin-top: 4px; }
-  .cart-qty-ctrl {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-  }
-  .cart-qty-btn {
-    width: 28px; height: 28px;
-    border-radius: 8px;
-    border: 1.5px solid #D0DCF0;
-    background: white;
-    color: var(--blue-dark);
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .cart-qty-btn.plus { background: var(--blue-dark); color: white; border-color: var(--blue-dark); }
-  .cart-qty-num { font-size: 14px; font-weight: 800; color: var(--blue-dark); }
+/* ========== FLOAT ADD BAR ========== */
+.float-bar {
+  margin: 4px 14px 10px;
+  background: var(--blue);
+  border-radius: 20px; padding: 11px 18px;
+  display: flex; justify-content: space-between; align-items: center;
+  box-shadow: 0 6px 20px rgba(13,59,140,0.28);
+  flex-shrink: 0;
+}
+.float-bar span { color:white; font-size:13px; font-weight:700; }
+.float-bar button {
+  background: var(--red); color: white; border: none;
+  border-radius: 14px; padding: 8px 16px;
+  font-size: 13px; font-weight: 800; cursor: pointer;
+}
+.float-bar button:active { opacity:0.85; }
 
-  .delete-btn {
-    background: #FFF0F0;
-    border: 1px solid #FFD0D0;
-    color: var(--red);
-    border-radius: 8px;
-    padding: 6px 8px;
-    font-size: 14px;
-    cursor: pointer;
-  }
+/* ========== CART ITEMS ========== */
+.cart-list { padding: 12px 14px; display:flex; flex-direction:column; gap:10px; }
 
-  .cart-summary {
-    background: white;
-    margin: 0 14px;
-    border-radius: var(--radius);
-    padding: 14px 18px;
-    box-shadow: var(--card-shadow);
-  }
-  .summary-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 5px 0;
-    font-size: 13px;
-    color: var(--gray-text);
-  }
-  .summary-row.total {
-    border-top: 1.5px solid #EEF2FB;
-    margin-top: 6px;
-    padding-top: 12px;
-    font-size: 16px;
-    font-weight: 900;
-    color: var(--blue-dark);
-  }
-  .summary-row.total span:last-child { color: var(--red); }
+.cart-item {
+  background: white; border-radius: var(--r-sm);
+  padding: 12px 13px;
+  display: flex; align-items: center; gap: 11px;
+  box-shadow: 0 3px 12px rgba(13,59,140,0.07);
+}
+.ci-img {
+  width: 54px; height: 54px;
+  background: var(--blue-light); border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 30px; flex-shrink: 0;
+}
+.ci-info { flex:1; }
+.ci-name  { font-size: 13px; font-weight: 700; color: var(--blue); }
+.ci-w     { font-size: 10px; color: var(--gray2); margin-top:2px; }
+.ci-price { font-size: 14px; font-weight: 900; color: var(--blue2); margin-top:4px; }
+.ci-ctrl  { display:flex; flex-direction:column; align-items:center; gap:4px; }
+.cib {
+  width: 28px; height: 28px; border-radius: 8px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 700;
+  border: 1.5px solid #D0DCF0; background: white; color: var(--blue);
+  transition: transform 0.1s;
+}
+.cib:active { transform: scale(0.85); }
+.cib.plus { background: var(--blue); color: white; border-color: var(--blue); }
+.ci-n { font-size: 14px; font-weight: 800; color: var(--blue); }
+.del-btn {
+  background: #FFF0F0; border: 1px solid #FFD0D0;
+  color: var(--red); border-radius: 8px;
+  padding: 6px 8px; font-size: 14px; cursor: pointer;
+  flex-shrink: 0;
+}
+.del-btn:active { background: #FFE0E0; }
 
-  .send-order-btn {
-    display: block;
-    margin: 14px 14px 6px;
-    background: linear-gradient(135deg, var(--red), #C01010);
-    color: white;
-    border: none;
-    border-radius: 30px;
-    padding: 15px;
-    font-size: 16px;
-    font-weight: 800;
-    cursor: pointer;
-    text-align: center;
-    box-shadow: 0 6px 20px rgba(224,32,32,0.35);
-    width: calc(100% - 28px);
-  }
+/* ========== NOTE BOX ========== */
+.note-box {
+  margin: 0 14px 12px;
+  background: white; border-radius: var(--r-sm);
+  padding: 12px 14px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+.note-box label { font-size: 12px; font-weight: 700; color: var(--blue); display:block; margin-bottom:6px; }
+.note-box textarea {
+  width:100%; border: 1.5px solid #D0DCF0; border-radius:8px;
+  padding:8px; font-size:12px; resize:none; outline:none;
+  color: var(--gray2); direction:rtl; font-family:inherit;
+}
 
-  /* ===========================
-     SCREEN 4 – CONFIRMATION
-  =========================== */
-  .confirm-screen {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 30px 24px;
-    text-align: center;
-    gap: 16px;
-    background: var(--gray-bg);
-  }
-  .confirm-circle {
-    width: 110px; height: 110px;
-    background: linear-gradient(135deg, #28C76F, #1DA85A);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 52px;
-    box-shadow: 0 10px 30px rgba(40,199,111,0.35);
-    animation: pop 0.4s ease;
-  }
-  @keyframes pop {
-    0% { transform: scale(0.5); opacity: 0; }
-    80% { transform: scale(1.1); }
-    100% { transform: scale(1); opacity: 1; }
-  }
-  .confirm-title {
-    font-size: 22px;
-    font-weight: 900;
-    color: var(--blue-dark);
-  }
-  .confirm-sub {
-    font-size: 13px;
-    color: var(--gray-text);
-    line-height: 1.6;
-    max-width: 260px;
-  }
-  .order-num-box {
-    background: white;
-    border-radius: var(--radius);
-    padding: 14px 28px;
-    box-shadow: var(--card-shadow);
-    border: 2px dashed #C8D8F5;
-  }
-  .order-num-label { font-size: 11px; color: var(--gray-text); }
-  .order-num { font-size: 22px; font-weight: 900; color: var(--blue-dark); letter-spacing: 2px; }
+/* ========== SUMMARY ========== */
+.summary {
+  margin: 0 14px 14px;
+  background: white; border-radius: var(--radius);
+  padding: 14px 18px;
+  box-shadow: var(--shadow);
+}
+.sum-row {
+  display: flex; justify-content: space-between;
+  align-items: center; padding: 5px 0;
+  font-size: 13px; color: var(--gray2);
+}
+.sum-row.total {
+  border-top: 1.5px solid #EEF2FB;
+  margin-top: 6px; padding-top: 12px;
+  font-size: 16px; font-weight: 900; color: var(--blue);
+}
 
-  .confirm-details {
-    background: white;
-    border-radius: var(--radius);
-    padding: 16px 20px;
-    width: 100%;
-    box-shadow: var(--card-shadow);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .detail-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 13px;
-  }
-  .detail-label { color: var(--gray-text); }
-  .detail-value { font-weight: 700; color: var(--blue-dark); }
-  .detail-value.green { color: #28C76F; }
+/* ========== CONFIRM SCREEN ========== */
+.confirm-body {
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  padding: 28px 20px; gap: 14px; text-align:center;
+  overflow-y: auto;
+}
+.confirm-body::-webkit-scrollbar { display:none; }
 
-  .track-btn {
-    background: var(--blue-dark);
-    color: white;
-    border: none;
-    border-radius: 30px;
-    padding: 14px;
-    font-size: 15px;
-    font-weight: 800;
-    cursor: pointer;
-    width: 100%;
-    box-shadow: 0 6px 20px rgba(13,59,140,0.25);
-  }
-  .new-order-btn {
-    background: white;
-    color: var(--blue-dark);
-    border: 2px solid var(--blue-dark);
-    border-radius: 30px;
-    padding: 12px;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    width: 100%;
-  }
+.check-circle {
+  width: 110px; height: 110px;
+  background: linear-gradient(135deg, #28C76F, #1DA85A);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 52px; color: white;
+  box-shadow: 0 10px 30px rgba(40,199,111,0.35);
+  animation: popIn 0.5s cubic-bezier(.4,0,.2,1);
+  flex-shrink: 0;
+}
+@keyframes popIn {
+  0%   { transform: scale(0.3); opacity:0; }
+  70%  { transform: scale(1.12); }
+  100% { transform: scale(1); opacity:1; }
+}
 
-  /* ===========================
-     RESPONSIVE TITLES
-  =========================== */
-  .screens-wrapper {
-    display: flex;
-    gap: 28px;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: flex-start;
-    padding: 20px;
-  }
+.conf-title { font-size: 22px; font-weight: 900; color: var(--blue); }
+.conf-sub { font-size: 13px; color: var(--gray2); line-height:1.65; max-width:270px; }
 
-  .screen-label-bottom {
-    text-align: center;
-    margin-top: 12px;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--blue-dark);
-    background: white;
-    padding: 6px 16px;
-    border-radius: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  }
+.order-box {
+  background: white; border-radius: var(--radius);
+  padding: 14px 28px;
+  box-shadow: var(--shadow);
+  border: 2px dashed #C8D8F5;
+  width: 100%;
+}
+.ob-label { font-size: 11px; color: var(--gray2); }
+.ob-num { font-size: 22px; font-weight: 900; color: var(--blue); letter-spacing:2px; }
 
-  /* Page indicator */
-  .page-dots {
-    display: flex;
-    gap: 5px;
-    justify-content: center;
-    padding: 8px;
-  }
-  .dot { width: 7px; height: 7px; background: #C8D8F5; border-radius: 50%; }
-  .dot.active { background: var(--blue-dark); width: 20px; border-radius: 4px; }
+.det-card {
+  background: white; border-radius: var(--radius);
+  padding: 16px 18px; width: 100%;
+  box-shadow: var(--shadow);
+  display:flex; flex-direction:column; gap:10px;
+}
+.det-title { font-size: 13px; font-weight: 800; color: var(--blue); }
+.det-row { display:flex; justify-content:space-between; font-size:13px; }
+.det-row span:first-child { color: var(--gray2); }
+.det-row span:last-child  { font-weight:700; color: var(--blue); }
+.det-row span.green { color: var(--green); }
+.det-row span.red   { color: var(--red); }
 
-  /* Promo banner */
-  .promo-banner {
-    margin: 0 16px 14px;
-    background: linear-gradient(120deg, #FF6B6B, var(--red));
-    border-radius: var(--radius);
-    padding: 12px 16px;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 12px;
-    font-weight: 700;
-    box-shadow: 0 4px 15px rgba(224,32,32,0.25);
-  }
-  .promo-text em { font-style: normal; font-size: 16px; display: block; }
-  .promo-code {
-    background: rgba(255,255,255,0.2);
-    border: 1.5px dashed rgba(255,255,255,0.6);
-    padding: 4px 10px;
-    border-radius: 8px;
-    font-size: 11px;
-  }
+.outline-btn {
+  background: white; color: var(--blue);
+  border: 2px solid var(--blue); border-radius: 30px;
+  padding: 13px; font-size: 14px; font-weight: 700;
+  cursor: pointer; width: 100%; transition: background 0.15s;
+}
+.outline-btn:active { background: var(--blue-light); }
+
+.hotline {
+  display:flex; align-items:center; gap:6px;
+  font-size:12px; color: var(--gray2);
+}
+.hotline strong { color: var(--blue); }
+
+/* ========== EMPTY CART ========== */
+.empty {
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:14px; padding:50px 24px; text-align:center;
+}
+.empty-icon { font-size:72px; }
+.empty h3 { font-size:18px; font-weight:800; color:var(--blue); }
+.empty p  { font-size:13px; color:var(--gray2); }
+
+/* ========== TOAST ========== */
+#toast {
+  position: fixed;
+  bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: #1a1a2e; color: white;
+  padding: 10px 22px; border-radius: 25px;
+  font-size: 13px; font-weight: 600;
+  opacity: 0; pointer-events: none;
+  transition: all 0.3s; z-index: 9999; white-space:nowrap;
+}
+#toast.show { opacity:1; transform: translateX(-50%) translateY(0); }
 
 </style>
 </head>
 <body>
 
-<div class="screens-wrapper">
+<div id="app">
 
-  <!-- ============================
-       PHONE 1 — الصفحة الرئيسية
-  ============================= -->
-  <div>
-    <div class="phone-wrapper">
-      <div class="phone">
-        <!-- Status Bar -->
-        <div class="status-bar">
-          <span>9:41</span>
-          <span>📶 🔋 98%</span>
+  <!-- ═══════════════════════════════
+       SCREEN 1 — الرئيسية
+  ════════════════════════════════ -->
+  <div class="screen active" id="s-home">
+
+    <div class="status-bar">
+      <span id="clock">9:41</span>
+      <span>📶 🔋 98%</span>
+    </div>
+
+    <div class="top-bar">
+      <div class="logo-wrap">
+        <div class="logo-main">O<span>K</span>IDS</div>
+        <div class="logo-sub">Groupe Goumidi</div>
+      </div>
+      <div class="top-actions">
+        <button class="icon-btn">🔔<span class="badge">2</span></button>
+        <button class="icon-btn" onclick="goTo('s-cart')">
+          🛒<span class="badge" id="cart-badge">0</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="search-wrap">
+      <div class="search-inner">
+        <span class="si">🔍</span>
+        <input type="text" placeholder="ابحث عن منتج...">
+      </div>
+    </div>
+
+    <div class="scroll-area">
+
+      <div class="welcome-card">
+        <div class="wc-text">
+          <h2>مرحباً، أحمد التاجر 👋</h2>
+          <p>اطلب منتجاتك المفضلة بسرعة</p>
         </div>
+        <div class="wc-icon">🥛</div>
+      </div>
 
-        <!-- Top Nav -->
-        <div class="top-nav">
-          <div class="logo-area">
-            <div class="logo-brand">O<span>K</span>IDS</div>
-            <div class="logo-sub">Groupe Goumidi</div>
-          </div>
-          <div class="nav-icons">
-            <button class="nav-icon">🔔<span class="badge">2</span></button>
-            <button class="nav-icon">🛒<span class="badge">5</span></button>
-          </div>
+      <div class="promo">
+        <div class="promo-left">
+          <em>عرض خاص للتجار!</em>
+          <span>خصم 10% على الطلبات فوق 50 كرتون</span>
         </div>
+        <div class="promo-code">OKIDS10</div>
+      </div>
 
-        <!-- Search -->
-        <div class="search-bar">
-          <div class="search-wrap">
-            <span class="search-icon">🔍</span>
-            <input class="search-input" type="text" placeholder="ابحث عن منتج...">
-          </div>
+      <button class="big-btn" onclick="goTo('s-products')">🛒 اطلب الآن</button>
+
+      <div class="sec-head">
+        <span class="sec-title">الفئات</span>
+        <span class="sec-link" onclick="goTo('s-products')">عرض الكل ›</span>
+      </div>
+
+      <div class="cats">
+        <div class="cat active">
+          <div class="cat-icon c0">🧀</div>
+          <span>جبن</span>
         </div>
-
-        <div class="screen">
-          <!-- Welcome Banner -->
-          <div class="welcome-banner">
-            <div class="welcome-text">
-              <h2>مرحباً، أحمد التاجر 👋</h2>
-              <p>اطلب منتجاتك المفضلة بسرعة</p>
-            </div>
-            <div class="welcome-emoji">🥛</div>
-          </div>
-
-          <!-- Promo Banner -->
-          <div class="promo-banner">
-            <div class="promo-text">
-              <em>عرض خاص للتجار!</em>
-              خصم 10% على الطلبات فوق 50 كرتون
-            </div>
-            <div class="promo-code">OKIDS10</div>
-          </div>
-
-          <!-- Order Now -->
-          <button class="order-now-btn">🛒 اطلب الآن</button>
-
-          <!-- Categories -->
-          <div class="section-header">
-            <span class="section-title">الفئات</span>
-            <span class="section-link">عرض الكل ›</span>
-          </div>
-          <div class="categories">
-            <div class="cat-item">
-              <div class="cat-icon active">🧀</div>
-              <span class="cat-label" style="color:#fff;background:var(--blue-dark);border-radius:8px;padding:2px 6px;">جبن</span>
-            </div>
-            <div class="cat-item">
-              <div class="cat-icon c1">🥛</div>
-              <span class="cat-label">حليب</span>
-            </div>
-            <div class="cat-item">
-              <div class="cat-icon c2">🧈</div>
-              <span class="cat-label">زبدة</span>
-            </div>
-            <div class="cat-item">
-              <div class="cat-icon c3">🍼</div>
-              <span class="cat-label">أطفال</span>
-            </div>
-            <div class="cat-item">
-              <div class="cat-icon c4">🥤</div>
-              <span class="cat-label">مشروبات</span>
-            </div>
-            <div class="cat-item">
-              <div class="cat-icon c5">🎁</div>
-              <span class="cat-label">عروض</span>
-            </div>
-          </div>
-
-          <!-- Featured Products -->
-          <div class="section-header">
-            <span class="section-title">⭐ منتجات مميزة</span>
-            <span class="section-link">عرض الكل ›</span>
-          </div>
-          <div class="featured-scroll">
-            <div class="feat-card">
-              <span class="feat-badge">الأكثر طلباً</span>
-              <div class="feat-img">🧀</div>
-              <div class="feat-name">جبن Okids بالحصص</div>
-              <div class="feat-price">320 دج</div>
-              <div class="feat-unit">/ الكرتون (24 قطعة)</div>
-              <button class="add-btn">+</button>
-            </div>
-            <div class="feat-card">
-              <span class="feat-badge" style="background:var(--blue-dark)">جديد</span>
-              <div class="feat-img">🧇</div>
-              <div class="feat-name">جبن Okids بالشريط</div>
-              <div class="feat-price">280 دج</div>
-              <div class="feat-unit">/ الكرتون</div>
-              <button class="add-btn">+</button>
-            </div>
-            <div class="feat-card">
-              <div class="feat-img">🥛</div>
-              <div class="feat-name">حليب أطفال بودرة</div>
-              <div class="feat-price">1850 دج</div>
-              <div class="feat-unit">/ كيس 25 كغ</div>
-              <button class="add-btn">+</button>
-            </div>
-            <div class="feat-card">
-              <span class="feat-badge" style="background:#28C76F">عرض</span>
-              <div class="feat-img">🍼</div>
-              <div class="feat-name">حليب UHT Okids</div>
-              <div class="feat-price">450 دج</div>
-              <div class="feat-unit">/ كرتون 12 لتر</div>
-              <button class="add-btn">+</button>
-            </div>
-          </div>
-
-          <!-- Page dots -->
-          <div class="page-dots">
-            <div class="dot active"></div>
-            <div class="dot"></div>
-            <div class="dot"></div>
-            <div class="dot"></div>
-          </div>
-
-          <div style="height:16px;"></div>
+        <div class="cat">
+          <div class="cat-icon c1">🥛</div>
+          <span>حليب</span>
         </div>
+        <div class="cat">
+          <div class="cat-icon c2">🧈</div>
+          <span>زبدة</span>
+        </div>
+        <div class="cat">
+          <div class="cat-icon c3">🍼</div>
+          <span>أطفال</span>
+        </div>
+        <div class="cat">
+          <div class="cat-icon c4">🥤</div>
+          <span>مشروبات</span>
+        </div>
+        <div class="cat">
+          <div class="cat-icon c5">🎁</div>
+          <span>عروض</span>
+        </div>
+      </div>
 
-        <!-- Bottom Nav -->
-        <div class="bottom-nav">
-          <div class="bn-item active">
-            <span class="bn-icon">🏠</span>
-            <span>الرئيسية</span>
-            <div class="bn-dot"></div>
-          </div>
-          <div class="bn-item">
-            <span class="bn-icon">📦</span>
-            <span>المنتجات</span>
-          </div>
-          <div class="bn-item">
-            <span class="bn-icon">🛒</span>
-            <span>السلة</span>
-          </div>
-          <div class="bn-item">
-            <span class="bn-icon">📋</span>
-            <span>طلباتي</span>
-          </div>
-          <div class="bn-item">
-            <span class="bn-icon">👤</span>
-            <span>حسابي</span>
+      <div class="sec-head">
+        <span class="sec-title">⭐ منتجات مميزة</span>
+        <span class="sec-link" onclick="goTo('s-products')">عرض الكل ›</span>
+      </div>
+
+      <div class="feat-scroll" id="feat-list"></div>
+
+      <div style="height:14px;"></div>
+    </div>
+
+    <div class="bottom-nav">
+      <div class="bn active" onclick="goTo('s-home')">
+        <span class="bn-icon">🏠</span>
+        <span class="bn-label">الرئيسية</span>
+        <div class="bn-bar"></div>
+      </div>
+      <div class="bn" onclick="goTo('s-products')">
+        <span class="bn-icon">📦</span>
+        <span class="bn-label">المنتجات</span>
+      </div>
+      <div class="bn" onclick="goTo('s-cart')">
+        <span class="bn-icon">🛒</span>
+        <span class="bn-label">السلة</span>
+      </div>
+      <div class="bn">
+        <span class="bn-icon">📋</span>
+        <span class="bn-label">طلباتي</span>
+      </div>
+      <div class="bn">
+        <span class="bn-icon">👤</span>
+        <span class="bn-label">حسابي</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════
+       SCREEN 2 — المنتجات
+  ════════════════════════════════ -->
+  <div class="screen" id="s-products">
+
+    <div class="status-bar">
+      <span id="clock2">9:41</span>
+      <span>📶 🔋 98%</span>
+    </div>
+
+    <div class="page-header">
+      <button class="back-btn" onclick="goBack()">‹</button>
+      <span class="page-title">📦 قائمة المنتجات</span>
+      <button class="icon-btn" onclick="goTo('s-cart')">
+        🛒<span class="badge" id="cart-badge2">0</span>
+      </button>
+    </div>
+
+    <div class="chips">
+      <div class="chip active" onclick="filterChip(this,'all')">الكل</div>
+      <div class="chip" onclick="filterChip(this,'cheese')">🧀 جبن</div>
+      <div class="chip" onclick="filterChip(this,'milk')">🥛 حليب</div>
+      <div class="chip" onclick="filterChip(this,'baby')">🍼 أطفال</div>
+      <div class="chip" onclick="filterChip(this,'butter')">🧈 زبدة</div>
+      <div class="chip" onclick="filterChip(this,'promo')">🎁 عروض</div>
+    </div>
+
+    <div class="scroll-area">
+      <div class="prod-grid" id="prod-grid"></div>
+      <div style="height:8px;"></div>
+    </div>
+
+    <div class="float-bar" id="float-bar" style="display:none;">
+      <span id="float-txt">0 منتجات</span>
+      <button onclick="goTo('s-cart')">إضافة للسلة 🛒</button>
+    </div>
+
+    <div class="bottom-nav">
+      <div class="bn" onclick="goTo('s-home')">
+        <span class="bn-icon">🏠</span>
+        <span class="bn-label">الرئيسية</span>
+      </div>
+      <div class="bn active" onclick="goTo('s-products')">
+        <span class="bn-icon">📦</span>
+        <span class="bn-label">المنتجات</span>
+        <div class="bn-bar"></div>
+      </div>
+      <div class="bn" onclick="goTo('s-cart')">
+        <span class="bn-icon">🛒</span>
+        <span class="bn-label">السلة</span>
+      </div>
+      <div class="bn">
+        <span class="bn-icon">📋</span>
+        <span class="bn-label">طلباتي</span>
+      </div>
+      <div class="bn">
+        <span class="bn-icon">👤</span>
+        <span class="bn-label">حسابي</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════
+       SCREEN 3 — السلة
+  ════════════════════════════════ -->
+  <div class="screen" id="s-cart">
+
+    <div class="status-bar">
+      <span id="clock3">9:41</span>
+      <span>📶 🔋 98%</span>
+    </div>
+
+    <div class="page-header">
+      <button class="back-btn" onclick="goBack()">‹</button>
+      <span class="page-title">🛒 سلة الطلب</span>
+      <span id="cart-count-badge"
+        style="background:rgba(255,255,255,0.2);color:white;border-radius:14px;
+               padding:3px 10px;font-size:11px;font-weight:700;margin-right:auto;">
+        0 منتجات
+      </span>
+    </div>
+
+    <div class="scroll-area" id="cart-scroll">
+      <div id="cart-body"></div>
+    </div>
+
+    <div class="bottom-nav">
+      <div class="bn" onclick="goTo('s-home')">
+        <span class="bn-icon">🏠</span>
+        <span class="bn-label">الرئيسية</span>
+      </div>
+      <div class="bn" onclick="goTo('s-products')">
+        <span class="bn-icon">📦</span>
+        <span class="bn-label">المنتجات</span>
+      </div>
+      <div class="bn active">
+        <span class="bn-icon">🛒</span>
+        <span class="bn-label">السلة</span>
+        <div class="bn-bar"></div>
+      </div>
+      <div class="bn">
+        <span class="bn-icon">📋</span>
+        <span class="bn-label">طلباتي</span>
+      </div>
+      <div class="bn">
+        <span class="bn-icon">👤</span>
+        <span class="bn-label">حسابي</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════
+       SCREEN 4 — تأكيد الطلب
+  ════════════════════════════════ -->
+  <div class="screen" id="s-confirm">
+
+    <div class="status-bar">
+      <span id="clock4">9:41</span>
+      <span>📶 🔋 98%</span>
+    </div>
+
+    <div class="page-header" style="justify-content:center;">
+      <span class="page-title" style="text-align:center;flex:unset;">✅ تأكيد الطلب</span>
+    </div>
+
+    <div class="confirm-body">
+      <div class="check-circle">✓</div>
+
+      <div class="conf-title">تم إرسال الطلب بنجاح! 🎉</div>
+      <div class="conf-sub">
+        شكراً لثقتك في <strong>Okids</strong>.<br>
+        سيتصل بك فريقنا لتأكيد الطلب وموعد التسليم.
+      </div>
+
+      <div class="order-box">
+        <div class="ob-label">رقم الطلب</div>
+        <div class="ob-num" id="order-num">#OKD-2025-0001</div>
+      </div>
+
+      <div class="det-card">
+        <div class="det-title">تفاصيل الطلب</div>
+        <div class="det-row"><span>📅 التاريخ</span><span id="ord-date">—</span></div>
+        <div class="det-row"><span>📦 عدد المنتجات</span><span id="ord-items">—</span></div>
+        <div class="det-row"><span>💰 الإجمالي</span><span id="ord-total" class="red">—</span></div>
+        <div class="det-row"><span>🚚 حالة الطلب</span><span class="green">✔ قيد المعالجة</span></div>
+        <div class="det-row"><span>📍 التوصيل</span><span>خلال 24-48 ساعة</span></div>
+      </div>
+
+      <button class="big-btn" style="margin:0;width:100%;" onclick="goTo('s-home')">
+        🏠 العودة للرئيسية
+      </button>
+      <button class="outline-btn" onclick="newOrder()">➕ طلب جديد</button>
+
+      <div class="hotline">
+        <span>📞 للاستفسار:</span>
+        <strong>025 43 80 22</strong>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /#app -->
+
+<div id="toast"></div>
+
+<script>
+/* ============================================================
+   DATA — Products
+============================================================ */
+const products = [
+  { id:1, name:'جبن Okids بالحصص', weight:'24 قطعة × 8غ',  price:320,  icon:'🧀', badge:'الأكثر طلباً', badgeColor:'#E02020', cat:'cheese',  featured:true  },
+  { id:2, name:'جبن Okids بالشريط', weight:'بار 200غ',       price:280,  icon:'🧇', badge:'جديد',       badgeColor:'#1A5DC8', cat:'cheese',  featured:true  },
+  { id:3, name:'جبن Okids مثلثات',  weight:'كرتون 48 قطعة', price:410,  icon:'🔺', badge:null,         badgeColor:null,      cat:'cheese',  featured:false },
+  { id:4, name:'حليب بودرة أطفال',  weight:'كيس 25 كغ',     price:1850, icon:'🥛', badge:null,         badgeColor:null,      cat:'milk',    featured:true  },
+  { id:5, name:'حليب UHT Okids',   weight:'كرتون 12 × 1L',  price:450,  icon:'🍼', badge:'عرض',        badgeColor:'#28C76F', cat:'baby',    featured:true  },
+  { id:6, name:'حليب خفيف الدسم',   weight:'كرتون 12 × 1L', price:420,  icon:'🥤', badge:null,         badgeColor:null,      cat:'milk',    featured:false },
+  { id:7, name:'زبدة Okids',        weight:'كرتون 20 × 250غ',price:560,  icon:'🧈', badge:null,         badgeColor:null,      cat:'butter',  featured:false },
+  { id:8, name:'حزمة رمضان Mixed',  weight:'مجموعة متنوعة',  price:2400, icon:'🎁', badge:'عرض',        badgeColor:'#E02020', cat:'promo',   featured:false },
+  { id:9, name:'قشطة Okids',        weight:'كرتون 24 × 150مل',price:390, icon:'🫙', badge:null,         badgeColor:null,      cat:'milk',    featured:false },
+  { id:10,name:'حليب مكثف محلى',   weight:'كرتون 24 × 397غ',price:680,  icon:'🥫', badge:null,         badgeColor:null,      cat:'milk',    featured:false },
+];
+
+/* ============================================================
+   CART STATE
+============================================================ */
+let cart = {}; // { productId: qty }
+
+function cartTotal()    { return Object.values(cart).reduce((a,b)=>a+b,0); }
+function cartItemCount(){ return Object.keys(cart).filter(k=>cart[k]>0).length; }
+
+function cartSubtotal(){
+  return products.reduce((sum,p) => sum + (cart[p.id]||0)*p.price, 0);
+}
+
+/* ============================================================
+   NAVIGATION
+============================================================ */
+let history_stack = ['s-home'];
+
+function goTo(id){
+  const cur = document.querySelector('.screen.active');
+  const nxt = document.getElementById(id);
+  if(!nxt || cur === nxt) return;
+  cur.classList.remove('active');
+  cur.classList.add('leaving');
+  nxt.classList.add('active');
+  setTimeout(()=> cur.classList.remove('leaving'), 350);
+  if(history_stack[history_stack.length-1] !== id) history_stack.push(id);
+  updateAll();
+}
+
+function goBack(){
+  if(history_stack.length > 1) history_stack.pop();
+  const prev = history_stack[history_stack.length-1];
+  const cur  = document.querySelector('.screen.active');
+  const prv  = document.getElementById(prev);
+  if(!prv || cur===prv) return;
+  cur.classList.remove('active');
+  prv.style.transform = 'translateX(-30%)';
+  prv.classList.add('active');
+  requestAnimationFrame(()=>{
+    prv.style.transition = 'transform 0.32s cubic-bezier(.4,0,.2,1)';
+    prv.style.transform = '';
+  });
+  setTimeout(()=>{ prv.style.transition=''; prv.style.transform=''; }, 350);
+  updateAll();
+}
+
+/* ============================================================
+   RENDER — Featured
+============================================================ */
+function renderFeatured(){
+  const c = document.getElementById('feat-list');
+  const feat = products.filter(p=>p.featured);
+  c.innerHTML = feat.map(p=>`
+    <div class="feat-card">
+      ${p.badge ? `<div class="f-badge" style="background:${p.badgeColor}">${p.badge}</div>` : ''}
+      <div class="f-img">${p.icon}</div>
+      <div class="f-name">${p.name}</div>
+      <div class="f-price">${p.price.toLocaleString('ar-DZ')} دج</div>
+      <div class="f-unit">/ ${p.weight}</div>
+      <button class="f-add" onclick="quickAdd(${p.id})">+</button>
+    </div>
+  `).join('');
+}
+
+function quickAdd(id){
+  cart[id] = (cart[id]||0) + 1;
+  showToast(`✅ تمت الإضافة للسلة`);
+  updateAll();
+}
+
+/* ============================================================
+   RENDER — Products Grid
+============================================================ */
+let currentFilter = 'all';
+
+function renderProducts(){
+  const grid = document.getElementById('prod-grid');
+  const list = currentFilter === 'all'
+    ? products
+    : products.filter(p => p.cat === currentFilter);
+
+  grid.innerHTML = list.map(p => {
+    const qty = cart[p.id] || 0;
+    return `
+      <div class="prod-card">
+        ${p.badge ? `<div class="p-badge" style="background:${p.badgeColor}20;color:${p.badgeColor};border:1px solid ${p.badgeColor}50">${p.badge}</div>` : ''}
+        <div class="p-img">${p.icon}</div>
+        <div class="p-name">${p.name}</div>
+        <div class="p-weight">${p.weight}</div>
+        <div class="p-row">
+          <div class="p-price">${p.price.toLocaleString('ar-DZ')} دج</div>
+          <div class="qty-row">
+            <button class="qb minus" onclick="changeQty(${p.id},-1)">−</button>
+            <span class="qn" id="qn-${p.id}">${qty}</span>
+            <button class="qb plus"  onclick="changeQty(${p.id},+1)">+</button>
           </div>
         </div>
       </div>
+    `;
+  }).join('');
+
+  updateFloatBar();
+}
+
+function changeQty(id, delta){
+  const cur = cart[id] || 0;
+  const nxt = Math.max(0, cur + delta);
+  if(nxt === 0) delete cart[id];
+  else cart[id] = nxt;
+  const el = document.getElementById(`qn-${id}`);
+  if(el) el.textContent = cart[id] || 0;
+  updateAll();
+  if(delta > 0) showToast('✅ تمت الإضافة للسلة');
+}
+
+function filterChip(el, cat){
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  currentFilter = cat;
+  renderProducts();
+}
+
+function updateFloatBar(){
+  const bar = document.getElementById('float-bar');
+  const cnt = cartItemCount();
+  if(cnt > 0){
+    bar.style.display = 'flex';
+    document.getElementById('float-txt').textContent = `${cnt} منتجات محددة`;
+  } else {
+    bar.style.display = 'none';
+  }
+}
+
+/* ============================================================
+   RENDER — Cart
+============================================================ */
+function renderCart(){
+  const body   = document.getElementById('cart-body');
+  const items  = products.filter(p => cart[p.id] > 0);
+  const sub    = cartSubtotal();
+  const disc   = sub >= 1500 ? Math.round(sub * 0.10) : 0;
+  const total  = sub - disc;
+  const cnt    = cartItemCount();
+
+  document.getElementById('cart-count-badge').textContent = `${cnt} منتجات`;
+
+  if(items.length === 0){
+    body.innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">🛒</div>
+        <h3>السلة فارغة</h3>
+        <p>أضف منتجات من قائمة المنتجات</p>
+        <button class="big-btn" style="margin:10px 0 0;" onclick="goTo('s-products')">
+          📦 تصفح المنتجات
+        </button>
+      </div>`;
+    return;
+  }
+
+  const itemsHTML = items.map(p => `
+    <div class="cart-item" id="ci-${p.id}">
+      <div class="ci-img">${p.icon}</div>
+      <div class="ci-info">
+        <div class="ci-name">${p.name}</div>
+        <div class="ci-w">${p.weight}</div>
+        <div class="ci-price">${(cart[p.id]*p.price).toLocaleString('ar-DZ')} دج</div>
+      </div>
+      <div class="ci-ctrl">
+        <button class="cib plus"  onclick="cartQty(${p.id},+1)">+</button>
+        <span   class="ci-n" id="cin-${p.id}">${cart[p.id]}</span>
+        <button class="cib"       onclick="cartQty(${p.id},-1)">−</button>
+      </div>
+      <button class="del-btn" onclick="removeItem(${p.id})">🗑</button>
     </div>
-    <div class="screen-label-bottom">📱 الشاشة 1 — الرئيسية</div>
-  </div>
+  `).join('');
 
-  <!-- ============================
-       PHONE 2 — قائمة المنتجات
-  ============================= -->
-  <div>
-    <div class="phone-wrapper">
-      <div class="phone">
-        <div class="status-bar">
-          <span>9:41</span>
-          <span>📶 🔋 98%</span>
-        </div>
-
-        <!-- Page Header -->
-        <div class="page-header">
-          <button class="back-btn">‹</button>
-          <span class="page-title">📦 قائمة المنتجات</span>
-          <button class="nav-icon" style="margin-right:auto;">🔍</button>
-        </div>
-
-        <div class="screen">
-          <!-- Filter Chips -->
-          <div class="filter-bar">
-            <div class="filter-chip active">الكل</div>
-            <div class="filter-chip">🧀 جبن</div>
-            <div class="filter-chip">🥛 حليب</div>
-            <div class="filter-chip">🍼 أطفال</div>
-            <div class="filter-chip">🧈 زبدة</div>
-            <div class="filter-chip">🎁 عروض</div>
-          </div>
-
-          <!-- Products Grid -->
-          <div class="products-grid">
-
-            <div class="prod-card">
-              <span class="prod-badge">الأكثر طلباً</span>
-              <div class="prod-img">🧀</div>
-              <div class="prod-name">جبن Okids بالحصص</div>
-              <div class="prod-weight">24 قطعة × 8غ</div>
-              <div class="prod-price-row">
-                <div class="prod-price">320 دج</div>
-                <div class="qty-ctrl">
-                  <button class="qty-btn minus">−</button>
-                  <span class="qty-num">2</span>
-                  <button class="qty-btn">+</button>
-                </div>
-              </div>
-            </div>
-
-            <div class="prod-card">
-              <span class="prod-badge" style="background:#0D3B8C15;color:#1A5DC8;border-color:#A8C4F0;">جديد</span>
-              <div class="prod-img">🧇</div>
-              <div class="prod-name">جبن Okids بالشريط</div>
-              <div class="prod-weight">بار 200غ</div>
-              <div class="prod-price-row">
-                <div class="prod-price">280 دج</div>
-                <div class="qty-ctrl">
-                  <button class="qty-btn minus">−</button>
-                  <span class="qty-num">0</span>
-                  <button class="qty-btn">+</button>
-                </div>
-              </div>
-            </div>
-
-            <div class="prod-card">
-              <div class="prod-img">🥛</div>
-              <div class="prod-name">حليب بودرة أطفال</div>
-              <div class="prod-weight">كيس 25 كغ</div>
-              <div class="prod-price-row">
-                <div class="prod-price">1850 دج</div>
-                <div class="qty-ctrl">
-                  <button class="qty-btn minus">−</button>
-                  <span class="qty-num">1</span>
-                  <button class="qty-btn">+</button>
-                </div>
-              </div>
-            </div>
-
-            <div class="prod-card">
-              <div class="prod-img">🍼</div>
-              <div class="prod-name">حليب UHT Okids</div>
-              <div class="prod-weight">كرتون 12 × 1L</div>
-              <div class="prod-price-row">
-                <div class="prod-price">450 دج</div>
-                <div class="qty-ctrl">
-                  <button class="qty-btn minus">−</button>
-                  <span class="qty-num">0</span>
-                  <button class="qty-btn">+</button>
-                </div>
-              </div>
-            </div>
-
-            <div class="prod-card">
-              <div class="prod-img">🧈</div>
-              <div class="prod-name">زبدة Okids</div>
-              <div class="prod-weight">كرتون 20 × 250غ</div>
-              <div class="prod-price-row">
-                <div class="prod-price">560 دج</div>
-                <div class="qty-ctrl">
-                  <button class="qty-btn minus">−</button>
-                  <span class="qty-num">0</span>
-                  <button class="qty-btn">+</button>
-                </div>
-              </div>
-            </div>
-
-            <div class="prod-card">
-              <span class="prod-badge" style="background:#FFF0F5;color:var(--red);border-color:#FFB0C0;">عرض</span>
-              <div class="prod-img">🎁</div>
-              <div class="prod-name">حزمة رمضان Mixed</div>
-              <div class="prod-weight">مجموعة متنوعة</div>
-              <div class="prod-price-row">
-                <div class="prod-price">2400 دج</div>
-                <div class="qty-ctrl">
-                  <button class="qty-btn minus">−</button>
-                  <span class="qty-num">0</span>
-                  <button class="qty-btn">+</button>
-                </div>
-              </div>
-            </div>
-
-          </div><!-- /grid -->
-
-          <!-- Add to cart floating bar -->
-          <div style="margin:4px 14px 8px;background:var(--blue-dark);border-radius:20px;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;color:white;box-shadow:0 6px 20px rgba(13,59,140,0.3);">
-            <span style="font-size:13px;font-weight:700;">3 منتجات محددة</span>
-            <button style="background:var(--red);color:white;border:none;border-radius:15px;padding:8px 18px;font-size:13px;font-weight:800;cursor:pointer;">إضافة للسلة 🛒</button>
-          </div>
-
-        </div>
-
-        <!-- Bottom Nav -->
-        <div class="bottom-nav">
-          <div class="bn-item"><span class="bn-icon">🏠</span><span>الرئيسية</span></div>
-          <div class="bn-item active"><span class="bn-icon">📦</span><span>المنتجات</span><div class="bn-dot"></div></div>
-          <div class="bn-item"><span class="bn-icon">🛒</span><span>السلة</span></div>
-          <div class="bn-item"><span class="bn-icon">📋</span><span>طلباتي</span></div>
-          <div class="bn-item"><span class="bn-icon">👤</span><span>حسابي</span></div>
-        </div>
+  body.innerHTML = `
+    <div class="cart-list">${itemsHTML}
+      <div class="note-box">
+        <label>📝 ملاحظة للتوصيل</label>
+        <textarea rows="2" placeholder="مثلاً: التوصيل قبل الظهر..."></textarea>
       </div>
     </div>
-    <div class="screen-label-bottom">📱 الشاشة 2 — المنتجات</div>
-  </div>
 
-  <!-- ============================
-       PHONE 3 — السلة
-  ============================= -->
-  <div>
-    <div class="phone-wrapper">
-      <div class="phone">
-        <div class="status-bar">
-          <span>9:41</span>
-          <span>📶 🔋 98%</span>
-        </div>
-
-        <div class="page-header">
-          <button class="back-btn">‹</button>
-          <span class="page-title">🛒 سلة الطلب</span>
-          <span style="background:rgba(255,255,255,0.2);color:white;border-radius:15px;padding:3px 10px;font-size:11px;font-weight:700;margin-right:auto;">3 منتجات</span>
-        </div>
-
-        <div class="screen">
-          <div class="cart-list">
-
-            <div class="cart-item">
-              <div class="cart-img">🧀</div>
-              <div class="cart-info">
-                <div class="cart-name">جبن Okids بالحصص</div>
-                <div class="cart-weight">24 قطعة × 8غ</div>
-                <div class="cart-price">640 دج</div>
-              </div>
-              <div class="cart-qty-ctrl">
-                <button class="cart-qty-btn plus">+</button>
-                <span class="cart-qty-num">2</span>
-                <button class="cart-qty-btn">−</button>
-              </div>
-              <button class="delete-btn">🗑</button>
-            </div>
-
-            <div class="cart-item">
-              <div class="cart-img">🥛</div>
-              <div class="cart-info">
-                <div class="cart-name">حليب بودرة أطفال</div>
-                <div class="cart-weight">كيس 25 كغ</div>
-                <div class="cart-price">1850 دج</div>
-              </div>
-              <div class="cart-qty-ctrl">
-                <button class="cart-qty-btn plus">+</button>
-                <span class="cart-qty-num">1</span>
-                <button class="cart-qty-btn">−</button>
-              </div>
-              <button class="delete-btn">🗑</button>
-            </div>
-
-            <div class="cart-item">
-              <div class="cart-img">🍼</div>
-              <div class="cart-info">
-                <div class="cart-name">حليب UHT Okids</div>
-                <div class="cart-weight">كرتون 12 × 1L</div>
-                <div class="cart-price">900 دج</div>
-              </div>
-              <div class="cart-qty-ctrl">
-                <button class="cart-qty-btn plus">+</button>
-                <span class="cart-qty-num">2</span>
-                <button class="cart-qty-btn">−</button>
-              </div>
-              <button class="delete-btn">🗑</button>
-            </div>
-
-            <!-- Add note -->
-            <div style="background:white;border-radius:12px;padding:12px 14px;box-shadow:0 3px 10px rgba(0,0,0,0.06);">
-              <div style="font-size:12px;font-weight:700;color:var(--blue-dark);margin-bottom:6px;">📝 ملاحظة للتوصيل</div>
-              <textarea style="width:100%;border:1.5px solid #D0DCF0;border-radius:8px;padding:8px;font-size:12px;resize:none;outline:none;color:var(--gray-text);font-family:inherit;direction:rtl;" rows="2" placeholder="أضف ملاحظة... (مثلاً: التوصيل قبل الظهر)"></textarea>
-            </div>
-          </div>
-
-          <!-- Summary -->
-          <div class="cart-summary">
-            <div class="summary-row"><span>المجموع الفرعي</span><span>3390 دج</span></div>
-            <div class="summary-row"><span>التوصيل</span><span style="color:#28C76F;font-weight:700;">مجاني 🎉</span></div>
-            <div class="summary-row"><span>الخصم (10%)</span><span style="color:var(--red);">−339 دج</span></div>
-            <div class="summary-row total"><span>الإجمالي</span><span>3051 دج</span></div>
-          </div>
-
-          <button class="send-order-btn">📤 إرسال الطلب</button>
-          <div style="height:10px;"></div>
-        </div>
-
-        <!-- Bottom Nav -->
-        <div class="bottom-nav">
-          <div class="bn-item"><span class="bn-icon">🏠</span><span>الرئيسية</span></div>
-          <div class="bn-item"><span class="bn-icon">📦</span><span>المنتجات</span></div>
-          <div class="bn-item active"><span class="bn-icon">🛒</span><span>السلة</span><div class="bn-dot"></div></div>
-          <div class="bn-item"><span class="bn-icon">📋</span><span>طلباتي</span></div>
-          <div class="bn-item"><span class="bn-icon">👤</span><span>حسابي</span></div>
-        </div>
-      </div>
+    <div class="summary">
+      <div class="sum-row"><span>المجموع الفرعي</span><span>${sub.toLocaleString('ar-DZ')} دج</span></div>
+      <div class="sum-row"><span>التوصيل</span><span style="color:var(--green);font-weight:700;">مجاني 🎉</span></div>
+      ${disc>0 ? `<div class="sum-row"><span>خصم 10%</span><span style="color:var(--red);">−${disc.toLocaleString('ar-DZ')} دج</span></div>` : ''}
+      <div class="sum-row total"><span>الإجمالي</span><span style="color:var(--red);">${total.toLocaleString('ar-DZ')} دج</span></div>
     </div>
-    <div class="screen-label-bottom">📱 الشاشة 3 — السلة</div>
-  </div>
 
-  <!-- ============================
-       PHONE 4 — تأكيد الطلب
-  ============================= -->
-  <div>
-    <div class="phone-wrapper">
-      <div class="phone">
-        <div class="status-bar">
-          <span>9:41</span>
-          <span>📶 🔋 98%</span>
-        </div>
+    <button class="big-btn" onclick="sendOrder()">📤 إرسال الطلب</button>
+    <div style="height:8px;"></div>
+  `;
+}
 
-        <div class="page-header" style="justify-content:center;text-align:center;">
-          <span class="page-title" style="text-align:center;">تأكيد الطلب</span>
-        </div>
+function cartQty(id, delta){
+  const nxt = Math.max(0,(cart[id]||0)+delta);
+  if(nxt===0) delete cart[id];
+  else cart[id]=nxt;
+  updateAll();
+}
 
-        <div class="confirm-screen">
-          <div class="confirm-circle">✓</div>
+function removeItem(id){
+  delete cart[id];
+  showToast('🗑 تم حذف المنتج');
+  updateAll();
+}
 
-          <div class="confirm-title">تم إرسال الطلب بنجاح! 🎉</div>
-          <div class="confirm-sub">
-            شكراً لثقتك في <strong>Okids</strong>. سيتصل بك فريقنا لتأكيد الطلب وتحديد موعد التسليم.
-          </div>
+/* ============================================================
+   SEND ORDER
+============================================================ */
+function sendOrder(){
+  const items = products.filter(p=>cart[p.id]>0);
+  if(items.length===0){ showToast('⚠️ السلة فارغة!'); return; }
 
-          <div class="order-num-box">
-            <div class="order-num-label">رقم الطلب</div>
-            <div class="order-num">#OKD-2025-0847</div>
-          </div>
+  const sub   = cartSubtotal();
+  const disc  = sub >= 1500 ? Math.round(sub*0.10) : 0;
+  const total = sub - disc;
+  const cnt   = cartItemCount();
+  const num   = '#OKD-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random()*9000)+1000);
+  const now   = new Date();
+  const date  = now.toLocaleDateString('ar-DZ',{day:'2-digit',month:'long',year:'numeric'});
 
-          <div class="confirm-details">
-            <div style="font-size:13px;font-weight:800;color:var(--blue-dark);margin-bottom:4px;">تفاصيل الطلب</div>
-            <div class="detail-row">
-              <span class="detail-label">📅 التاريخ</span>
-              <span class="detail-value">04 مايو 2025</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">⏰ الوقت</span>
-              <span class="detail-value">09:41 ص</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">📦 عدد المنتجات</span>
-              <span class="detail-value">3 منتجات</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">💰 الإجمالي</span>
-              <span class="detail-value" style="color:var(--red);">3051 دج</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">🚚 حالة الطلب</span>
-              <span class="detail-value green">✔ قيد المعالجة</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">📍 التوصيل</span>
-              <span class="detail-value">خلال 24-48 ساعة</span>
-            </div>
-          </div>
+  document.getElementById('order-num').textContent   = num;
+  document.getElementById('ord-date').textContent    = date;
+  document.getElementById('ord-items').textContent   = cnt + ' منتجات';
+  document.getElementById('ord-total').textContent   = total.toLocaleString('ar-DZ') + ' دج';
 
-          <button class="track-btn">📍 تتبع الطلب</button>
-          <button class="new-order-btn">➕ طلب جديد</button>
+  goTo('s-confirm');
+}
 
-          <div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--gray-text);">
-            <span>للاستفسار:</span>
-            <span style="color:var(--blue-dark);font-weight:700;">025 43 80 22</span>
-          </div>
-        </div>
+function newOrder(){
+  cart = {};
+  history_stack = ['s-home'];
+  document.querySelectorAll('.screen').forEach(s=>{ s.classList.remove('active','leaving'); });
+  document.getElementById('s-home').classList.add('active');
+  updateAll();
+  showToast('🆕 يمكنك البدء بطلب جديد');
+}
 
-        <!-- Bottom Nav -->
-        <div class="bottom-nav">
-          <div class="bn-item"><span class="bn-icon">🏠</span><span>الرئيسية</span></div>
-          <div class="bn-item"><span class="bn-icon">📦</span><span>المنتجات</span></div>
-          <div class="bn-item"><span class="bn-icon">🛒</span><span>السلة</span></div>
-          <div class="bn-item active"><span class="bn-icon">📋</span><span>طلباتي</span><div class="bn-dot"></div></div>
-          <div class="bn-item"><span class="bn-icon">👤</span><span>حسابي</span></div>
-        </div>
-      </div>
-    </div>
-    <div class="screen-label-bottom">📱 الشاشة 4 — تأكيد الطلب</div>
-  </div>
+/* ============================================================
+   UPDATE ALL BADGES & LISTS
+============================================================ */
+function updateAll(){
+  const cnt = cartTotal();
+  ['cart-badge','cart-badge2'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.textContent = cnt;
+  });
+  renderProducts();
+  renderCart();
+}
 
-</div><!-- /screens-wrapper -->
+/* ============================================================
+   TOAST
+============================================================ */
+let toastTimer;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2200);
+}
 
+/* ============================================================
+   CLOCK
+============================================================ */
+function updateClock(){
+  const now = new Date();
+  const t = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+  ['clock','clock2','clock3','clock4'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.textContent=t;
+  });
+}
+setInterval(updateClock, 10000);
+updateClock();
+
+/* ============================================================
+   INIT
+============================================================ */
+renderFeatured();
+renderProducts();
+renderCart();
+
+</script>
 </body>
-      </html>
+</html>
