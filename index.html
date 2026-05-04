@@ -1,55 +1,146 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Cairo', sans-serif; background-color: #f8f9fa; }
-        .wave-bg {
-            background-color: #ef4444;
-            border-radius: 50% 50% 0 0 / 20% 20% 0 0;
-        }
-    </style>
-</head>
-<body class="flex justify-center items-center min-h-screen p-4">
+import 'package:flutter/material.dart';
 
-    <div class="max-w-sm w-full bg-white shadow-xl rounded-xl overflow-hidden border border-gray-100">
-        
-        <div class="flex justify-center p-4">
-            <img src="https://via.placeholder.com/150x50?text=Groupe+Goumidi" alt="Logo" class="h-12 object-contain">
-        </div>
+void main() {
+  runApp(MyApp());
+}
 
-        <div class="px-6 pb-4">
-            <button class="w-full bg-[#ef4444] text-white py-3 rounded-lg flex justify-center items-center gap-2 text-lg font-bold shadow-md active:scale-95 transition-transform">
-                <span>قائمة طعام</span>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-            </button>
-        </div>
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: ProductPage(),
+    );
+  }
+}
 
-        <div class="relative bg-white pt-4 px-10">
-            <img src="https://via.placeholder.com/300x400?text=Okids+Product" alt="Okids Milk" class="w-full h-auto object-contain">
-        </div>
+class ProductPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Color(0xFFF5F5F5),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
 
-        <div class="wave-bg bg-[#ef4444] text-white text-center py-8 px-6 -mt-10 relative z-10">
-            <h2 class="text-2xl font-bold mb-2">حليب الأطفال المجفف</h2>
-            <p class="text-sm opacity-90 leading-relaxed">
-                ماء معالج، مسحوق حليب الشيدر، ملح الطعام.
-            </p>
-        </div>
+              // 🔹 Logo + Title
+              SizedBox(height: 20),
+              Column(
+                children: [
+                  Image.asset(
+                    'assets/logo.png',
+                    height: 80,
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    "Groupe Industriel Goumidi",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blueGrey,
+                    ),
+                  ),
+                ],
+              ),
 
-        <div class="py-10 flex justify-center bg-[#fefefe]">
-            <div class="border-2 border-red-500 p-1 rounded-lg">
-                <button class="bg-[#ef4444] text-white px-10 py-2 rounded-md font-bold hover:bg-red-600 transition-colors">
-                    يكتشف
-                </button>
-            </div>
-        </div>
+              SizedBox(height: 20),
 
-    </div>
+              // 🔴 Button (Menu)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.symmetric(vertical: 15),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Center(
+                    child: Text(
+                      "قائمة طعام",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
 
-</body>
-</html>
+              SizedBox(height: 20),
+
+              // 🖼️ Product Image
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Container(
+                  padding: EdgeInsets.all(10),
+                  color: Colors.white,
+                  child: Image.asset(
+                    'assets/product.png',
+                    height: 250,
+                  ),
+                ),
+              ),
+
+              SizedBox(height: 20),
+
+              // 🔴 Description Box
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      "حليب الأطفال المجفف",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      "ماء معالج، مسحوق حليب الشيدر، ملح الطعام.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: 30),
+
+              // 🔘 Discover Button
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.red, width: 2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  "يكتشف",
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+
+              SizedBox(height: 30),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
